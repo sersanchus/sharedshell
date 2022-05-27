@@ -18,8 +18,8 @@ class SharedShell(ContextDecorator):
     _MARKER_END = '#### END ####'
     _ERROR = ' WITH ERROR ####'
 
-    def __enter__(self):
-        """ Create a new shell. """
+    def __init__(self):
+        """ Initialize the shell. """
 
         self._shell_resource = subprocess.Popen(
             'cmd /V:ON' if platform.system() == 'Windows' else 'sh',
@@ -27,12 +27,15 @@ class SharedShell(ContextDecorator):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=True,
-            text=True,
-            encoding=os.device_encoding(0)
+            text=True
         )
+
+    def __enter__(self):
+        """ Enter context. """
+
         return self
 
-    def __exit__(self, *exc):
+    def __exit__(self, *_exc):
         """ Free the shell resources. """
 
         os.kill(self._shell_resource.pid, signal.SIGTERM)
