@@ -30,6 +30,12 @@ class SharedShell(ContextDecorator):
             text=True
         )
 
+    def __del__(self):
+        """ Garbage collector was called."""
+
+        if self._shell_resource:
+            os.kill(self._shell_resource.pid, signal.SIGTERM)
+
     def __enter__(self):
         """ Enter context. """
 
@@ -39,6 +45,7 @@ class SharedShell(ContextDecorator):
         """ Free the shell resources. """
 
         os.kill(self._shell_resource.pid, signal.SIGTERM)
+        self._shell_resource = None
 
     def run(self, cmd_str, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
         """ Executes the command string. """
